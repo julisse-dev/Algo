@@ -51,7 +51,11 @@ std::vector<point> triABulles(std::vector<point> nuage, int numVar)
     return nuage;
 }
 
-//TODO : vérifier que les cas N=2 et N=3 fonctionnent correctement
+//Remarque sur les cas N=0, N=1. La fonction renvoie un couple partiellement initialisé, dont juste couplePondere.min = INF est placé. 
+//Cela fonctionne dans l'algorithme, car le code n'as pas besoin de couplePondere.x/.y pour ses calculs dans la fonction rechercheOptimisee.
+//De plus, si N=0 ou N=1, on recherche un couple dans un ensemble à 0 ou 1 point. Cela n'a pas de sens, et renvoyer l'infini pour comparer
+//avec un autre couple fait sens, car tout couple sera toujours plus proche qu'un point où un vide. 
+//Par soucis de concision, un garde a été rajouté dans la fonction rechercheOptimisee pour être certain que ce cas n'arrive pas.
 couplePondere rechercheNaive(const std::vector<point>& liste) //N(N-1)/2 appels à distance. O(n²)
 {
     std::size_t N = liste.size();
@@ -108,41 +112,91 @@ couplePondere rechercheOptimisee(
     //REGNER : comparaison des résultats obtenus et return du min
 
     float delta;
+    bool gaucheDroite; //Sert à enregistrer si le couple minimal est à gauche (false) ou à droite (true)
     if (coupleGauche.min<coupleDroite.min)
     {
         delta = coupleGauche.min;
+        gaucheDroite = false;
     }
     else
     {
         delta = coupleDroite.min;
+        gaucheDroite = true;
     }
-    float cdMediane = nuageTrieParVar[0][medianeX]; //On met la médiane exactement au 1er point à droite, c'est suffisant
-    std::vector bandeCentrale; //On utilise un std::vector car on ne sait pas a priori le nombre d'éléments de la bande centrale. 
+    float cdMediane = nuageTrieParVar[0][medianeX][0]; //On met la médiane exactement au 1er point à droite, c'est suffisant
+    std::vector<point> bandeCentrale; //On utilise un std::vector car on ne sait pas a priori le nombre d'éléments de la bande centrale. 
     for (std::size_t i = 0; i<N; i++) //On détermine les points dans la bande centrale, et on les prend triés par ordonnée.
     {
-        if (std::abs(nuageTrieParVar[1][debut+i] - cdMediane)<delta)
+        if (std::abs((nuageTrieParVar[1][debut+i][0] - cdMediane)*(nuageTrieParVar[1][debut+i][0] - cdMediane))<delta)
         {
             bandeCentrale.push_back(nuageTrieParVar[1][debut+i]);
         }
     }
     std::size_t M = bandeCentrale.size();
-    for (std::size_t i = 0; i<M; i++)
+    couplePondere coupleCentral;
+    coupleCentral.min = INF;
+    coupleCentral.x[0] = INF;
+    coupleCentral.x[1] = INF;
+    coupleCentral.y[0] = INF;
+    coupleCentral.y[1] = INF;
+    couplePondere temp;
+    std::vector<point> septPlusProchesVoisins(8);
+
+    if (M<2) //Garde évoqué dans les commentaires de rechercheNaive
     {
-        if (M<7)
+        if (gaucheDroite)
         {
-            
+            return coupleDroite;
         }
-        std::vector pEtSes7Voisins
+        else
+        {
+            return coupleGauche;
+        }
+    }
+
+    if (M<7)
+    {
+        coupleCentral = rechercheNaive(bandeCentrale);
+    }
+    else
+    {
+        for (std::size_t i = 0; i<M-7; i++)
+        {
+            septPlusProchesVoisins[0] = bandeCentrale[i];
+            for (std::size_t j = 1; j <8; j++)
+            {
+                septPlusProchesVoisins[j]= bandeCentrale[i+j];
+            }
+            temp = rechercheNaive(septPlusProchesVoisins);
+            if (temp.min < coupleCentral.min)
+            {
+                coupleCentral = temp;
+            }
+        }
+    }
+
+
+    if ((coupleCentral.min)*(coupleCentral.min) < delta)
+    {
+        return coupleCentral;
+    }
+    else if (gaucheDroite)
+    {
+        return coupleDroite;
+    }
+    else 
+    {
+        return coupleGauche;
     }
 }
 
 int main()
 {
     point a = {0, 0};
-    point b = {5, 0};
-    point c = {7, 0};   
-    point d = {9, 0};
-    point e = {10, 0};  // paire optimale : (d,e), distance² = 1
+    point b = {0, 1};  // paire optimale : (a,b), distance² = 1
+    point c = {0, 5};
+    point d = {3, 0};
+    point e = {6, 0};
     std::vector<point> nuage = {a,b,c,d,e};
     std::array<std::vector<point>, DIMENSION> nuageTrieParVar;
     std::size_t N = 5;
