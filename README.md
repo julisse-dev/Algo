@@ -1,3 +1,3 @@
-Bonjour, vous trouverez une implémentation en C++ de l'algorithme de Dijkstra. 
-L'algorithme peut-être amélioré en implémentant une file de priorité, pour atteindre une complexité de O((A+S)log(S))
-où A est le nombre d'arrêtes et S le nombre de sommets (contre O(S²) actuellement). 
+Bienvenue sur mon repo ! Vous trouverez ici plusieurs projets d'algorithmique en C++. 
+Au 02/05/26, j'ai mis en ligne une implémentation de l'algorithme de Djikstra pour la recherche d'un chemin le plus court dans un graphe pondéré
+et un début d'implémentation de l'algorithme de recherche de la paire de point la plus proche dans un nuage de points, basé sur diviser pour régner.
