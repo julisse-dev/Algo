@@ -71,7 +71,7 @@ void tri_rapide(std::vector<point>& nuage, std::size_t premier, std::size_t dern
 //Remarque sur les cas N=0, N=1. La fonction renvoie un couple partiellement initialisé, dont juste couplePondere.min = INF est placé. 
 //Cela fonctionne dans l'algorithme, car le code n'as pas besoin de couplePondere.x/.y pour ses calculs dans la fonction rechercheOptimisee.
 //De plus, si N=0 ou N=1, on recherche un couple dans un ensemble à 0 ou 1 point. Cela n'a pas de sens, et renvoyer l'infini pour comparer
-//avec un autre couple fait sens, car tout couple sera toujours plus proche qu'un point où un vide. 
+//avec un autre couple fait sens, car tout couple sera toujours plus proche qu'un point ou un vide. 
 //Par soucis de concision, un garde a été rajouté dans la fonction rechercheOptimisee pour être certain que ce cas n'arrive pas.
 couplePondere rechercheNaive(const std::vector<point>& liste) //N(N-1)/2 appels à distance. O(n²)
 {
@@ -95,7 +95,8 @@ couplePondere rechercheNaive(const std::vector<point>& liste) //N(N-1)/2 appels 
 }
 
 //Principe : On divise le tableau en deux parties, de tailles égales en utilisant la médiane verticale donnée par début et fin. On appelle récursivement
-//la fonction jusqu'à ce que nuage.size()<=3, et dans ce cas on appelle rechercheNaive. On remonte ensuite les informations.
+//la fonction jusqu'à ce que nuage.size()<=3, et dans ce cas on appelle rechercheNaive. On remonte ensuite les informations. On traite enfin le cas 
+//de la bande centrale.
 //On pose comme convention que le tableau donné est des indices debut à fin-1, l'indice fin n'est pas inclus.
 couplePondere rechercheOptimisee(
     const std::array<std::vector<point>, DIMENSION>& nuageTrieParVar, 
@@ -137,7 +138,7 @@ couplePondere rechercheOptimisee(
     //REGNER : comparaison des résultats obtenus, cas de la bande centrale et return du min
 
     float delta;
-    bool gaucheDroite; //Sert à enregistrer si le couple minimal est à gauche (false) ou à droite (true)
+    bool gaucheDroite; //Encode si le couple minimal est à gauche (false) ou à droite (true)
     if (coupleGauche.min<coupleDroite.min)
     {
         delta = coupleGauche.min;
@@ -150,9 +151,20 @@ couplePondere rechercheOptimisee(
     }
     float cdMediane = nuageTrieParVar[0][medianeX][0]; //On met la médiane exactement au 1er point à droite, c'est suffisant
     std::vector<point> bandeCentrale; //On utilise un std::vector car on ne sait pas a priori le nombre d'éléments de la bande centrale. 
+<<<<<<< HEAD
 
 
     for (std::size_t i = 0; i<nuageTrieParVar[1].size(); i++) //On détermine les points dans la bande centrale, et on les prend triés par ordonnée.
+=======
+    
+    //PRINCIPE : On va inclure dans le vector bandeCentrale que les points dont le carré de l'ordonnée est inférieure à detla (cf. commentaire distance, delta =d(a,b)²)
+    //On va ensuite rechercher exhaustivement (rechercheNaive) pour chaque point et ses 7 voisins suivants (triés par ordonnée) s'il existe un couple de distance 
+    //inférieure. Cela n'augmente pas la complexité, car 8 (=1+7) est constant, et le coût de rechercheNaive est donc lui aussi constant dans ce cadre.
+    //On se contente de choisir 7 points suivant par un argument géométrique
+    //(source : 2ème page, http://tnsi.free.fr/documents/10.3.%20Diviser_pour_regner_points_plus_proches.pdf)
+    
+    for (std::size_t i = 0; i<N; i++) //On détermine les points dans la bande centrale, et on les prend triés par ordonnée.
+>>>>>>> dd626927f2dd1f96d9145b6bfae150145c991835
     {
         if (std::abs((nuageTrieParVar[1][i][0] - cdMediane)*(nuageTrieParVar[1][i][0] - cdMediane))<delta)
         {
@@ -166,9 +178,7 @@ couplePondere rechercheOptimisee(
     coupleCentral.x[1] = INF;
     coupleCentral.y[0] = INF;
     coupleCentral.y[1] = INF;
-    couplePondere temp;
-    std::vector<point> septPlusProchesVoisins(8);
-
+    
     if (M<2) //Garde évoqué dans les commentaires de rechercheNaive
     {
         if (gaucheDroite)
@@ -180,7 +190,10 @@ couplePondere rechercheOptimisee(
             return coupleGauche;
         }
     }
-
+    
+    couplePondere temp;
+    std::vector<point> septPlusProchesVoisins(8);
+    
     if (M<7)
     {
         coupleCentral = rechercheNaive(bandeCentrale);
@@ -202,6 +215,10 @@ couplePondere rechercheOptimisee(
         }
     }
 
+<<<<<<< HEAD
+=======
+    //Recollement des résulats en fonction d'où est le min
+>>>>>>> dd626927f2dd1f96d9145b6bfae150145c991835
     if ((coupleCentral.min)*(coupleCentral.min) < delta)
     {
         return coupleCentral;
@@ -218,6 +235,7 @@ couplePondere rechercheOptimisee(
 
 int main()
 {
+<<<<<<< HEAD
     point a1  = {1.2,   3.4};
     point a2  = {-5.6,  7.8};
     point a3  = {9.0,  -1.2};
@@ -254,6 +272,16 @@ int main()
     std::vector<point> nuage = {a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26,a27,a28,a29,a30,a31,a32};
     std::size_t N = 32;
 
+=======
+    point a = {0, 0};
+    point b = {0, 1};  // paire optimale : (a,b), distance² = 1
+    point c = {0, 5};
+    point d = {3, 0};
+    point e = {6, 0};
+    
+    std::vector<point> nuage = {a,b,c,d,e};
+    
+>>>>>>> dd626927f2dd1f96d9145b6bfae150145c991835
     std::array<std::vector<point>, DIMENSION> nuageTrieParVar;
 
     for (int i = 0; i<DIMENSION; i++)
@@ -264,7 +292,8 @@ int main()
     
     couplePondere coupleNaif = rechercheNaive(nuage);
     couplePondere coupleOpti = rechercheOptimisee(nuageTrieParVar, 0, N);
-
+    
+    //Rendus de rechercheNaive vis à vis de rechercheOpti
     std::cout << "(" << coupleNaif.x[0] << "," << coupleNaif.x[1] << ")";
     std::cout << "(" << coupleNaif.y[0] << "," << coupleNaif.y[1] << ")"<<std::endl;
     std::cout << "(" << coupleOpti.x[0] << "," << coupleOpti.x[1] << ")";
