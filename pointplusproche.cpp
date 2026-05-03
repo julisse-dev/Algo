@@ -61,35 +61,12 @@ void tri_rapide(std::vector<point>& nuage, std::size_t premier, std::size_t dern
     {
         std::size_t pivot = premier;
         pivot = partitionnement(nuage, premier, dernier, pivot, numVar);
-        if (pivot > premier) // évite le underflow
+        if (pivot > premier) // évite l'underflow
             tri_rapide(nuage, premier, pivot-1, numVar);
         tri_rapide(nuage, pivot+1, dernier, numVar);
-}   
+    }   
 }
 
-
-
-
-
-//On utilise pour l'instant un tri à bulles pour ranger les tableaux. C'est inefficace et devra être amélioré (prob. par un quicksort). O(n²)
-std::vector<point> triABulles(std::vector<point> nuage, int numVar)
-{
-    std::size_t N = nuage.size();
-    point aux;
-    for (std::size_t i = N-1; i>0; i--)
-    {
-        for (std::size_t j = 0; j<i; j++)
-        {
-            if (nuage[j+1][numVar] < nuage[j][numVar])
-            {
-                aux = nuage[j+1];
-                nuage[j+1]=nuage[j];
-                nuage[j] = aux;
-            }
-        }
-    }
-    return nuage;
-}
 
 //Remarque sur les cas N=0, N=1. La fonction renvoie un couple partiellement initialisé, dont juste couplePondere.min = INF est placé. 
 //Cela fonctionne dans l'algorithme, car le code n'as pas besoin de couplePondere.x/.y pour ses calculs dans la fonction rechercheOptimisee.
@@ -252,7 +229,7 @@ int main()
     point a9  = {3.4,  -5.6};
     point a10 = {-7.8,  9.0};
     point a11 = {2.3,   4.5};
-    point a12 = {-6.7,  8.9};
+    point a12 = {-6.7,  8.9}; // paire proche 1 NON UNIQUE
     point a13 = {10.1, -2.3};
     point a14 = {-4.5,  6.7};
     point a15 = {8.9,  -10.1};
@@ -270,9 +247,9 @@ int main()
     point a27 = {4.4,  -6.6};
     point a28 = {-8.8,  0.5};
     point a29 = {2.2,  -4.4};
-    point a30 = {-6.6,  8.8};
-    point a31 = {1.1,   2.2};  // paire proche
-    point a32 = {1.2,   2.3};  // paire proche
+    point a30 = {-6.6,  8.8};  // paire proche 1 NON UNIQUE
+    point a31 = {1.1,   2.2};  // paire proche 2 NON UNIQUE
+    point a32 = {1.2,   2.3};  // paire proche 2 NON UNIQUE 
 
     std::vector<point> nuage = {a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26,a27,a28,a29,a30,a31,a32};
     std::size_t N = 32;
