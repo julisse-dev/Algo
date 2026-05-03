@@ -151,11 +151,6 @@ couplePondere rechercheOptimisee(
     }
     float cdMediane = nuageTrieParVar[0][medianeX][0]; //On met la médiane exactement au 1er point à droite, c'est suffisant
     std::vector<point> bandeCentrale; //On utilise un std::vector car on ne sait pas a priori le nombre d'éléments de la bande centrale. 
-<<<<<<< HEAD
-
-
-    for (std::size_t i = 0; i<nuageTrieParVar[1].size(); i++) //On détermine les points dans la bande centrale, et on les prend triés par ordonnée.
-=======
     
     //PRINCIPE : On va inclure dans le vector bandeCentrale que les points dont le carré de l'ordonnée est inférieure à detla (cf. commentaire distance, delta =d(a,b)²)
     //On va ensuite rechercher exhaustivement (rechercheNaive) pour chaque point et ses 7 voisins suivants (triés par ordonnée) s'il existe un couple de distance 
@@ -164,7 +159,6 @@ couplePondere rechercheOptimisee(
     //(source : 2ème page, http://tnsi.free.fr/documents/10.3.%20Diviser_pour_regner_points_plus_proches.pdf)
     
     for (std::size_t i = 0; i<N; i++) //On détermine les points dans la bande centrale, et on les prend triés par ordonnée.
->>>>>>> dd626927f2dd1f96d9145b6bfae150145c991835
     {
         if (std::abs((nuageTrieParVar[1][i][0] - cdMediane)*(nuageTrieParVar[1][i][0] - cdMediane))<delta)
         {
@@ -215,10 +209,7 @@ couplePondere rechercheOptimisee(
         }
     }
 
-<<<<<<< HEAD
-=======
     //Recollement des résulats en fonction d'où est le min
->>>>>>> dd626927f2dd1f96d9145b6bfae150145c991835
     if ((coupleCentral.min)*(coupleCentral.min) < delta)
     {
         return coupleCentral;
@@ -235,7 +226,6 @@ couplePondere rechercheOptimisee(
 
 int main()
 {
-<<<<<<< HEAD
     point a1  = {1.2,   3.4};
     point a2  = {-5.6,  7.8};
     point a3  = {9.0,  -1.2};
@@ -271,17 +261,7 @@ int main()
 
     std::vector<point> nuage = {a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26,a27,a28,a29,a30,a31,a32};
     std::size_t N = 32;
-
-=======
-    point a = {0, 0};
-    point b = {0, 1};  // paire optimale : (a,b), distance² = 1
-    point c = {0, 5};
-    point d = {3, 0};
-    point e = {6, 0};
     
-    std::vector<point> nuage = {a,b,c,d,e};
-    
->>>>>>> dd626927f2dd1f96d9145b6bfae150145c991835
     std::array<std::vector<point>, DIMENSION> nuageTrieParVar;
 
     for (int i = 0; i<DIMENSION; i++)
