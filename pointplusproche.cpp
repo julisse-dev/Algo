@@ -30,6 +30,46 @@ float distance(point x, point y) //Calcule la distance euclidienne entre deux po
 // Calculer la racine à chaque itération de distance est un calcul inutile. On la calculera qu'à la fin si besoin de l'afficher. 
 
 
+//QUICKSORT
+//Convention : "dernier" est le dernier indice du nuage, ie nuage va de premier à dernier exactement
+int partitionnement(std::vector<point>& nuage, std::size_t premier, std::size_t dernier, std::size_t pivot, int numVar)
+{
+    point aux;
+    aux = nuage[pivot];
+    nuage[pivot] = nuage[dernier];
+    nuage[dernier] = aux;
+    int j = premier;
+    for (std::size_t i = premier; i<dernier; i++)  
+    {
+        if (nuage[i][numVar]<=nuage[dernier][numVar])
+        {
+            aux = nuage[i];
+            nuage[i] = nuage[j];
+            nuage[j] = aux;
+            j++;
+        }
+    }
+    aux = nuage[dernier];
+    nuage[dernier] = nuage[j];
+    nuage[j] = aux;
+    return j;
+}
+
+void tri_rapide(std::vector<point>& nuage, std::size_t premier, std::size_t dernier, int numVar)
+{
+    if (premier < dernier)
+    {
+        std::size_t pivot = premier;
+        pivot = partitionnement(nuage, premier, dernier, pivot, numVar);
+        if (pivot > premier) // évite le underflow
+            tri_rapide(nuage, premier, pivot-1, numVar);
+        tri_rapide(nuage, pivot+1, dernier, numVar);
+}   
+}
+
+
+
+
 
 //On utilise pour l'instant un tri à bulles pour ranger les tableaux. C'est inefficace et devra être amélioré (prob. par un quicksort). O(n²)
 std::vector<point> triABulles(std::vector<point> nuage, int numVar)
@@ -84,9 +124,17 @@ couplePondere rechercheOptimisee(
     const std::array<std::vector<point>, DIMENSION>& nuageTrieParVar, 
     std::size_t debut, 
     std::size_t fin)
-{
 
+{
     std::size_t N = fin - debut;
+
+    //Cas dégénéré
+    if (N < 2)
+    {
+        couplePondere vide;
+        vide.min = INF;
+        return vide;
+    }
 
     //Cas d'arrêt : N<=3. On fait une recherche exhaustive.
     if (N<4)
@@ -109,7 +157,7 @@ couplePondere rechercheOptimisee(
     couplePondere coupleGauche = rechercheOptimisee(nuageTrieParVar, debut, medianeX); //L'intérêt est de travailler avec le même tableau, nuageTrieParVar
     couplePondere coupleDroite = rechercheOptimisee(nuageTrieParVar, medianeX, fin); //Et de ne pas créer des sous-vecteurs pour éviter de charger la mémoire
     
-    //REGNER : comparaison des résultats obtenus et return du min
+    //REGNER : comparaison des résultats obtenus, cas de la bande centrale et return du min
 
     float delta;
     bool gaucheDroite; //Sert à enregistrer si le couple minimal est à gauche (false) ou à droite (true)
@@ -125,11 +173,13 @@ couplePondere rechercheOptimisee(
     }
     float cdMediane = nuageTrieParVar[0][medianeX][0]; //On met la médiane exactement au 1er point à droite, c'est suffisant
     std::vector<point> bandeCentrale; //On utilise un std::vector car on ne sait pas a priori le nombre d'éléments de la bande centrale. 
-    for (std::size_t i = 0; i<N; i++) //On détermine les points dans la bande centrale, et on les prend triés par ordonnée.
+
+
+    for (std::size_t i = 0; i<nuageTrieParVar[1].size(); i++) //On détermine les points dans la bande centrale, et on les prend triés par ordonnée.
     {
-        if (std::abs((nuageTrieParVar[1][debut+i][0] - cdMediane)*(nuageTrieParVar[1][debut+i][0] - cdMediane))<delta)
+        if (std::abs((nuageTrieParVar[1][i][0] - cdMediane)*(nuageTrieParVar[1][i][0] - cdMediane))<delta)
         {
-            bandeCentrale.push_back(nuageTrieParVar[1][debut+i]);
+            bandeCentrale.push_back(nuageTrieParVar[1][i]);
         }
     }
     std::size_t M = bandeCentrale.size();
@@ -175,7 +225,6 @@ couplePondere rechercheOptimisee(
         }
     }
 
-
     if ((coupleCentral.min)*(coupleCentral.min) < delta)
     {
         return coupleCentral;
@@ -192,18 +241,50 @@ couplePondere rechercheOptimisee(
 
 int main()
 {
-    point a = {0, 0};
-    point b = {0, 1};  // paire optimale : (a,b), distance² = 1
-    point c = {0, 5};
-    point d = {3, 0};
-    point e = {6, 0};
-    std::vector<point> nuage = {a,b,c,d,e};
+    point a1  = {1.2,   3.4};
+    point a2  = {-5.6,  7.8};
+    point a3  = {9.0,  -1.2};
+    point a4  = {-3.4,  5.6};
+    point a5  = {7.8,  -9.0};
+    point a6  = {-1.2,  3.4};
+    point a7  = {5.6,  -7.8};
+    point a8  = {-9.0,  1.2};
+    point a9  = {3.4,  -5.6};
+    point a10 = {-7.8,  9.0};
+    point a11 = {2.3,   4.5};
+    point a12 = {-6.7,  8.9};
+    point a13 = {10.1, -2.3};
+    point a14 = {-4.5,  6.7};
+    point a15 = {8.9,  -10.1};
+    point a16 = {-2.3,  4.5};
+    point a17 = {6.7,  -8.9};
+    point a18 = {-10.1, 2.3};
+    point a19 = {4.5,  -6.7};
+    point a20 = {-8.9,  10.1};
+    point a21 = {0.5,   1.5};
+    point a22 = {-4.4,  6.6};
+    point a23 = {8.8,  -0.5};
+    point a24 = {-2.2,  4.4};
+    point a25 = {6.6,  -8.8};
+    point a26 = {-0.5,  2.5};
+    point a27 = {4.4,  -6.6};
+    point a28 = {-8.8,  0.5};
+    point a29 = {2.2,  -4.4};
+    point a30 = {-6.6,  8.8};
+    point a31 = {1.1,   2.2};  // paire proche
+    point a32 = {1.2,   2.3};  // paire proche
+
+    std::vector<point> nuage = {a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20,a21,a22,a23,a24,a25,a26,a27,a28,a29,a30,a31,a32};
+    std::size_t N = 32;
+
     std::array<std::vector<point>, DIMENSION> nuageTrieParVar;
-    std::size_t N = 5;
+
     for (int i = 0; i<DIMENSION; i++)
     {
-        nuageTrieParVar[i] = triABulles(nuage, i);
+        nuageTrieParVar[i] = nuage;
+        tri_rapide(nuageTrieParVar[i], 0, N-1, i);
     }
+    
     couplePondere coupleNaif = rechercheNaive(nuage);
     couplePondere coupleOpti = rechercheOptimisee(nuageTrieParVar, 0, N);
 
@@ -211,7 +292,7 @@ int main()
     std::cout << "(" << coupleNaif.y[0] << "," << coupleNaif.y[1] << ")"<<std::endl;
     std::cout << "(" << coupleOpti.x[0] << "," << coupleOpti.x[1] << ")";
     std::cout << "(" << coupleOpti.y[0] << "," << coupleOpti.y[1] << ")"<<std::endl;
-
+    
 
     return 0;
 }
